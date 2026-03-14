@@ -7,17 +7,22 @@ model = YOLO('best.pt')
 def photo_alaysis(photo):
     results = model.predict(photo, conf = 0.5)
     selected_frame = results[0].plot()
+    # opencv reads photos as the format of bgr but gradio uses rgb
     return cv2.cvtColor(selected_frame, cv2.COLOR_BGR2RGB)
 
 def video_alaysis(video):
     output_video_path = "output_video.mp4"
 
     cam = cv2.VideoCapture(video)
+
+    # to learns original video sizes
     fps = int(cam.get(cv2.CAP_PROP_FPS))
     width = int(cam.get(cv2.CAP_PROP_FRAME_WIDTH))
     height = int(cam.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
+    # fourcc -> four haracter code m-p-4-v  
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+    # creates an empty file to write the processed video
     storage = cv2.VideoWriter(output_video_path, fourcc, fps, (width, height))
 
     while cam.isOpened():
@@ -26,6 +31,7 @@ def video_alaysis(video):
         if not ret:
             break
 
+        # vrebose fasle means that it will not print the details of the processing in the console
         results = model.predict(frame, conf= 0.5, verbose=False)
         selected_frame = results[0].plot()
         storage.write(selected_frame)

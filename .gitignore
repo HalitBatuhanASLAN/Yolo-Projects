@@ -1,0 +1,13 @@
+# Sanal ortamları engelle
+venv/
+.venv/
+env/
+
+# Büyük binary dosyalarını engelle
+*.dll
+*.pyd
+*.exe
+
+# Python önbellekleri
+__pycache__/
+*.pyc

@@ -1,0 +1,32 @@
+# config.py
+MIN_DETECTION_CONFIDENCE = 0.8
+MIN_TRACKING_CONFIDENCE = 0.8
+MAX_NUM_HANDS = 1
+
+COOLDOWN = 1.8
+SWIPE_THRESHOLD = 0.1
+ANGLE_THRESHOLD = 15  # Ses tık hassasiyeti
+
+# Nokta Kuyruk Uzunlukları
+PTS_LEN = 15
+TRACK_PTS_LEN = 10
+TAB_PTS_LEN = 10
+ALT_TAB_PTS_LEN = 10
+
+SCROLL_SENSITIVITY = 30  # Sayı büyüdükçe daha hızlı kaydırır
+
+
+# config.py dosyana ekle
+# Renkler (BGR formatı)
+COLOR_CYAN = (255, 255, 0)
+COLOR_MAGENTA = (255, 0, 255)
+COLOR_GREEN = (0, 255, 0)
+COLOR_RED = (0, 0, 255)
+COLOR_WHITE = (255, 255, 255)
+COLOR_BLACK = (0, 0, 0)
+
+# HUD Ayarları
+BAR_HEIGHT = 200
+BAR_WIDTH = 25
+BAR_X = 50
+BAR_Y = 150
