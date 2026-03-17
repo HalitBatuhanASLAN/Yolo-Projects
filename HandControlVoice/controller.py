@@ -1,19 +1,20 @@
-# controller.py - GÜNCELLENMİŞ TAM HALİ
-
 import pyautogui
 import time
 import math
-import ctypes # Windows sistem komutları için
+import ctypes 
 from collections import deque
 import config
+from overlay_manager import overlay # Yeni OSD sistemimiz
 
 class ActionController:
     def __init__(self):
+        # Hareket takibi için kuyruklar
         self.pts = deque(maxlen=config.PTS_LEN)
         self.track_pts = deque(maxlen=config.TRACK_PTS_LEN)
         self.tab_pts = deque(maxlen=config.TAB_PTS_LEN)
         self.alt_tab_pts = deque(maxlen=10)
         
+        # Durum değişkenleri
         self.last_action_time = 0
         self.accumulated_angle = 0
         self.prev_angle = None
@@ -29,21 +30,19 @@ class ActionController:
         is_track_mode = up == [1, 1, 1, 1, 1]
         is_volume_mode = up == [0, 1, 0, 0, 0]
         is_scroll_mode = up == [0, 0, 0, 0, 1]
-        
-        # YENİ JEST: BAŞ VE SERÇE PARMAK (Win + L) -> [1, 0, 0, 0, 1]
         is_lock_mode = up == [1, 0, 0, 0, 1]
 
-        # --- AKSİYONLAR ---
+        # --- AKSİYONLAR VE OSD BİLDİRİMLERİ ---
 
         # 1. WINDOWS LOCK (Baş + Serçe)
         if is_lock_mode:
             if current_time - self.last_action_time > config.COOLDOWN:
-                # Windows'u kilitlemenin en garantici yolu:
+                overlay.show_message("🔒 SYSTEM LOCKED", duration=2.0)
                 ctypes.windll.user32.LockWorkStation()
                 self.last_action_time = current_time
                 return "SYSTEM LOCKED"
 
-        # 2. SMART SCROLL (Serçe)
+        # 2. SMART SCROLL (Serçe) - OSD gerekmez, akışkan olmalı
         elif is_scroll_mode:
             current_y = hand_lms.landmark[20].y 
             if self.prev_y is not None:
@@ -58,6 +57,7 @@ class ActionController:
         elif is_wolf:
             if current_time - self.last_action_time > config.COOLDOWN:
                 pyautogui.press("playpause")
+                overlay.show_message("🐺 MEDIA PLAY/PAUSE", duration=1.5)
                 self.last_action_time = current_time
                 return "MEDIA TOGGLE"
 
@@ -67,10 +67,14 @@ class ActionController:
             if len(self.tab_pts) == 10 and current_time - self.last_action_time > config.COOLDOWN:
                 diff_x = self.tab_pts[-1] - self.tab_pts[0]
                 if diff_x > config.SWIPE_THRESHOLD:
-                    pyautogui.hotkey('ctrl', 'tab'); self.last_action_time = current_time
+                    pyautogui.hotkey('ctrl', 'tab')
+                    overlay.show_message("📑 NEXT TAB")
+                    self.last_action_time = current_time
                     self.tab_pts.clear(); return "TAB NEXT"
                 elif diff_x < -config.SWIPE_THRESHOLD:
-                    pyautogui.hotkey('ctrl', 'shift', 'tab'); self.last_action_time = current_time
+                    pyautogui.hotkey('ctrl', 'shift', 'tab')
+                    overlay.show_message("📑 PREV TAB")
+                    self.last_action_time = current_time
                     self.tab_pts.clear(); return "TAB PREV"
 
         # 5. ALT+TAB (Dörtlü Pençe)
@@ -79,10 +83,14 @@ class ActionController:
             if len(self.alt_tab_pts) == 10 and current_time - self.last_action_time > config.COOLDOWN:
                 diff_x = self.alt_tab_pts[-1] - self.alt_tab_pts[0]
                 if diff_x > config.SWIPE_THRESHOLD:
-                    pyautogui.hotkey('alt', 'tab'); self.last_action_time = current_time
+                    pyautogui.hotkey('alt', 'tab')
+                    overlay.show_message("🪟 SWITCH APP")
+                    self.last_action_time = current_time
                     self.alt_tab_pts.clear(); return "APP NEXT"
                 elif diff_x < -config.SWIPE_THRESHOLD:
-                    pyautogui.hotkey('alt', 'shift', 'tab'); self.last_action_time = current_time
+                    pyautogui.hotkey('alt', 'shift', 'tab')
+                    overlay.show_message("🪟 SWITCH APP")
+                    self.last_action_time = current_time
                     self.alt_tab_pts.clear(); return "APP PREV"
 
         # 6. TRACK SWIPE (Tam Avuç)
@@ -91,10 +99,14 @@ class ActionController:
             if len(self.track_pts) == 10 and current_time - self.last_action_time > config.COOLDOWN:
                 diff_x = self.track_pts[-1] - self.track_pts[0]
                 if diff_x > config.SWIPE_THRESHOLD:
-                    pyautogui.press("nexttrack"); self.last_action_time = current_time
+                    pyautogui.press("nexttrack")
+                    overlay.show_message("🎵 NEXT TRACK")
+                    self.last_action_time = current_time
                     self.track_pts.clear(); return "TRACK NEXT"
                 elif diff_x < -config.SWIPE_THRESHOLD:
-                    pyautogui.press("prevtrack"); self.last_action_time = current_time
+                    pyautogui.press("prevtrack")
+                    overlay.show_message("🎵 PREV TRACK")
+                    self.last_action_time = current_time
                     self.track_pts.clear(); return "TRACK PREV"
 
         # 7. VOLUME (Tek İşaret)
@@ -104,16 +116,24 @@ class ActionController:
             if len(self.pts) > 10:
                 x_avg = sum([p[0] for p in self.pts]) / len(self.pts)
                 y_avg = sum([p[1] for p in self.pts]) / len(self.pts)
+                
+                # Açı hesaplama:
+                # $current\_angle = \arctan2(cy - y\_avg, cx - x\_avg)$
                 current_angle = math.degrees(math.atan2(cy - y_avg, cx - x_avg))
+                
                 if self.prev_angle is not None:
                     diff = current_angle - self.prev_angle
                     if diff > 180: diff -= 360
                     if diff < -180: diff += 360
                     self.accumulated_angle += diff
+                    
                     if self.accumulated_angle > config.ANGLE_THRESHOLD:
-                        pyautogui.press("volumeup"); self.accumulated_angle = 0
+                        pyautogui.press("volumeup")
+                        # Ses modunda OSD sürekli çıkmasın diye küçük bir kontrol eklenebilir
+                        self.accumulated_angle = 0
                     elif self.accumulated_angle < -config.ANGLE_THRESHOLD:
-                        pyautogui.press("volumedown"); self.accumulated_angle = 0
+                        pyautogui.press("volumedown")
+                        self.accumulated_angle = 0
                 self.prev_angle = current_angle
             return "VOLUME MODE"
         

@@ -1,0 +1,13 @@
+train: ../train/images
+val: ../valid/images
+test: ../test/images
+
+nc: 4
+names: ['coca-cola', 'doble cola', 'doble cola naranja', 'sprite']
+
+roboflow:
+  workspace: oscarlpz
+  project: coke-3cfyv
+  version: 1
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/oscarlpz/coke-3cfyv/dataset/1

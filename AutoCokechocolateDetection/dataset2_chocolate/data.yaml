@@ -1,0 +1,13 @@
+train: ../train/images
+val: ../valid/images
+test: ../test/images
+
+nc: 4
+names: ['cadbury_chocolate', 'kitkat_chocolate', 'mars_chocolate', 'snickers_chocolate']
+
+roboflow:
+  workspace: chocolate-detection
+  project: chocolate-detection-41qji
+  version: 6
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/chocolate-detection/chocolate-detection-41qji/dataset/6

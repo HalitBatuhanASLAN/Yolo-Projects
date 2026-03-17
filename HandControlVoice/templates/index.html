@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wolf Controller v1.0</title>
+    <style>
+        body {
+            background-color: #0d1117;
+            color: #58a6ff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+        .header {
+            margin-bottom: 30px;
+            text-shadow: 0 0 10px #00FFFF;
+        }
+        .monitor-box {
+            border: 2px solid #30363d;
+            border-radius: 12px;
+            background: #161b22;
+            padding: 10px;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);
+        }
+        #videoFeed {
+            width: 640px;
+            height: 480px;
+            border-radius: 8px;
+            display: none; /* Başlatana kadar gizli */
+        }
+        .controls {
+            margin-top: 25px;
+        }
+        button {
+            background: transparent;
+            color: #00FFFF;
+            border: 1px solid #00FFFF;
+            padding: 12px 35px;
+            font-size: 16px;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: 0.3s;
+            border-radius: 5px;
+        }
+        button:hover {
+            background: #00FFFF;
+            color: #000;
+            box-shadow: 0 0 15px #00FFFF;
+        }
+        .status {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #8b949e;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>WOLF HAND CONTROLLER</h1>
+    </div>
+
+    <div class="monitor-box">
+        <img id="videoFeed" src="" alt="Kamera Akışı">
+        <div id="placeholder" style="width:640px; height:480px; display:flex; align-items:center; justify-content:center; color:#30363d;">
+            <h3>SİSTEM BEKLEMEDE...</h3>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button id="startBtn" onclick="startSystem()">SİSTEMİ ATEŞLE</button>
+    </div>
+
+    <div class="status">
+        Durum: <span id="statusText" style="color:#00FF00;">Hazır</span>
+    </div>
+
+    <script>
+        function startSystem() {
+            const video = document.getElementById('videoFeed');
+            const placeholder = document.getElementById('placeholder');
+            const btn = document.getElementById('startBtn');
+            const status = document.getElementById('statusText');
+
+            video.src = "/video_feed";
+            video.style.display = "block";
+            placeholder.style.display = "none";
+            btn.style.display = "none";
+            status.innerText = "Aktif - Elini Kameraya Göster";
+        }
+    </script>
+</body>
+</html>

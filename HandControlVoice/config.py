@@ -30,3 +30,8 @@ BAR_HEIGHT = 200
 BAR_WIDTH = 25
 BAR_X = 50
 BAR_Y = 150
+
+
+OVERLAY_OPACITY = 0.8
+OVERLAY_DURATION = 1.2 # Ekrandaki görselin kalma süresi (sn)
+UI_THEME_COLOR = "#00FFFF" # Neon Cyan
