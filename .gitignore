@@ -11,3 +11,4 @@ env/
 # Python önbellekleri
 __pycache__/
 *.pyc
+*.zip
